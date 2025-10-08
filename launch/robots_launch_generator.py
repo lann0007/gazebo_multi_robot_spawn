@@ -99,11 +99,18 @@ class LaunchFileGenerator:
 
             for k in range(self.num_robots):
                 f.write(f'    <group ns="robot_{k}">\n')
-                f.write('        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">\n')
-                f.write('            <param name="publish_frequency" type="double" value="50.0" />\n')
+
+                # Robot state publisher
+                f.write(f'        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">\n')
+                f.write(f'            <param name="publish_frequency" type="double" value="50.0" />\n')
                 f.write(f'            <param name="tf_prefix" value="robot_{k}" />\n')
+                f.write(f'        </node>\n')
+                f.write(f'       <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model robot_{k} -x $(arg robot_{k}_pos_x) -y $(arg robot_{k}_pos_y) -z $(arg robot_{k}_pos_z) -Y $(arg robot_{k}_yaw) -param /robot_description" />\n')
+                
+                f.write(f'        <node pkg="gazebo_multi_robot_spawn" type="comm_node.py" name="comm_node_{k}" output="screen">\n')
+                f.write(f'            <param name="robot_id" value="{k}" />\n')
                 f.write('        </node>\n')
-                f.write(f'        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model robot_{k} -x $(arg robot_{k}_pos_x) -y $(arg robot_{k}_pos_y) -z $(arg robot_{k}_pos_z) -Y $(arg robot_{k}_yaw) -param /robot_description" />\n')
+
                 f.write('    </group>\n')
 
             f.write('</launch>\n')
